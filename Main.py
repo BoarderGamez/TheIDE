@@ -6,6 +6,13 @@ root = tk.Tk()
 root.geometry("300x300")
 
 # Config
+config={}
+with open("config.txt", "r") as F:
+    for line in F:
+        line = line.strip()
+        if line and "=" in line:
+            key,value =line.split("=",1)
+            config[key.strip()] = value.strip()
 TextAreaMainFont = ("Helvetica", 20)
 
 # Var
