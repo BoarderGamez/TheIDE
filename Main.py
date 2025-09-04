@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import filedialog
+from tkinter import messagebox
 root = tk.Tk()
 root.geometry("300x300")
 
@@ -11,13 +13,24 @@ SettingsWindow = None
 
 # Functions
 def FileNew():
-    pass
+    TextAreaMain.delete(1.0,tk.END)
 def FileOpen():
-    pass
+    File=filedialog.askopenfilename(defaultextension=".txt", filetypes=[("Text Files","*.txt"),("All files","*.*")])
+    if File:
+        with open(File, "r") as F:
+            Content = F.read()
+        TextAreaMain.delete(1.0,tk.END)
+        TextAreaMain.insert(tk.END, Content)
 def FileSave():
-    pass
+    File = filedialog.asksaveasfilename(defaultextension=".txt",filetypes=[("Text Files","*.txt"),("All files", "*.*")])
+    if File:
+        with open(File, "w") as F:
+            F.write(TextAreaMain.get(1.0,tk.END))
 def FileExit():
-    pass
+    ExitConfirmation = messagebox.askyesno("Confirm Exit", "Do you want to exit?")
+
+    if ExitConfirmation:
+        root.destroy()
 def FileSettings():
     global SettingsWindow
     if SettingsWindow and SettingsWindow.winfo_exists():
@@ -29,23 +42,29 @@ def FileSettings():
     SettingsWindow.resizable(False, False)
 
 def EditUndo():
-    pass
+    TextAreaMain.event_generate("<<Undo>>")
 def EditRedo():
-    pass
+    TextAreaMain.event_generate("<<Redo>>")
 def EditCut():
-    pass
+    TextAreaMain.event_generate("<<Cut>>")
 def EditCopy():
-    pass
+    TextAreaMain.event_generate("<<Copy>>")
 def EditPaste():
-    pass
+    TextAreaMain.event_generate("<<Paste>>")
 
 # Full Menu bar
 MenuBar=tk.Menu(root)
 root.config(menu=MenuBar)
-
+#Frame
+TextAMainFrame = ttk.Frame(root)
+TextAMainFrame.pack(expand=True, fill = tk.BOTH)
+#ScrollBar
+ScrollbarMainRight = ttk.Scrollbar(TextAMainFrame, orient="vertical")
+ScrollbarMainRight.pack(side=tk.RIGHT,fill=tk.Y)
 #Text area
-TextAreaMain = tk.Text(root,wrap=tk.WORD,font=TextAreaMainFont)
-TextAreaMain.pack(expand=True,fill=tk.BOTH)
+TextAreaMain = tk.Text(TextAMainFrame, wrap=tk.WORD, font=TextAreaMainFont, undo=True, yscrollcommand=ScrollbarMainRight.set)
+TextAreaMain.pack(side=tk.LEFT, expand=True,fill=tk.BOTH)
+ScrollbarMainRight.config(command=TextAreaMain.yview)
 # File Menu
 FileMenu=tk.Menu(MenuBar,tearoff=0)
 MenuBar.add_cascade(label="File", menu=FileMenu)
