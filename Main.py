@@ -1,18 +1,21 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, StringVar
 from tkinter import filedialog
 from tkinter import messagebox
+import configparser
 root = tk.Tk()
 root.geometry("300x300")
 
 # Config
-config={}
-with open("config.txt", "r") as F:
-    for line in F:
-        line = line.strip()
-        if line and "=" in line:
-            key,value =line.split("=",1)
-            config[key.strip()] = value.strip()
+def ConfigCreate():
+    config = configparser.ConfigParser()
+
+    config['General'] = {"Current_Font":'Arial'}
+
+    with open('config.ini', 'w') as configfile:
+        config.write(configfile)
+if __name__ == "__main__":
+    ConfigCreate()
 TextAreaMainFont = ("Helvetica", 20)
 
 # Var
@@ -38,8 +41,63 @@ def FileExit():
 
     if ExitConfirmation:
         root.destroy()
+def ConfirmButtonSettings():
+
 def FileSettings():
     global SettingsWindow
+    global FontOptions
+    global SelectedFont
+    FontOptions = ["Arial",
+                   "Calibri",
+                   "Verdana",
+                   "Roman",
+                   "TINspireKeys",
+                   "TINspireKeysCX",
+                   "System",
+                   "Terminal",
+                   "Fixedsys",
+                   "Modern",
+                   "Roman Script",
+                   "Courier",
+                   "MS Serif",
+                   "MS Sans Serif",
+                   "Small Font Marlett",
+                   "Arial",
+                   "Arabic Transparent",
+                   "Arial Baltic",
+                   "Arial CYR",
+                   "Arial Greek",
+                   "Arial TUR",
+                   "Arial Black",
+                   "Bahnschrift SemiBold",
+                   "Bahnschrift Light SemiCondensed",
+                   "Bahnschrift SemiLight SemiCondensed",
+                   "Bahnschrift SemiCondensed",
+                   "Bahnschrift Semibold",
+                   "Bahnschrift SemiBold Condensed",
+                   "Malgun Gothic",
+                   "Microsoft Yi Baiti",
+                   "Mingliu-ExtB",
+                   "MingLiU_HKSCS-ExtB",
+                   "Times New Roman",
+                   "Sitka Banner",
+                   "Segoe UI",
+                   "Nirmala UI",
+                   "Nirmala UI Semilight",
+                   "Yu Gothic Medium",
+                   "Gabriola",
+                   "Myanmar Text",
+                   "Nirmala UI",
+                   "Nirmala UI Semilight",
+                   "Microsoft Yahei Light",
+                   "MS PGothic",
+                   "Sgoe UI",
+                   "SimSun",
+                   "Yu Gothic Medium",
+                   "Yu Gothic",
+                   "Yu GothicUI",
+                   "Sylfaen",
+                   "Symbol"]
     if SettingsWindow and SettingsWindow.winfo_exists():
         SettingsWindow.lift()
         return
@@ -47,7 +105,15 @@ def FileSettings():
     SettingsWindow.title("Settings")
     SettingsWindow.geometry("300x300")
     SettingsWindow.resizable(False, False)
-
+    SettingsWindowTopLabelFrame = ttk.LabelFrame(SettingsWindow,text="Appearance Settings")
+    SettingsWindowTopLabelFrame.grid(column=0, row=0)
+    SettingsFontLabel = ttk.Label(SettingsWindowTopLabelFrame, text="Font")
+    SettingsFontLabel.grid(row=0,column=0)
+    SettingsFontDropdown = ttk.Combobox(SettingsWindowTopLabelFrame, values=FontOptions, state="readonly")
+    SettingsFontDropdown.grid(row=0,column=1)
+    SettingsFontDropdown.set("Arial")
+    SettingsConfirmButton = ttk.Button(SettingsWindow, text="Confirm")
+    SettingsConfirmButton.grid(row=1,column=0)
 def EditUndo():
     TextAreaMain.event_generate("<<Undo>>")
 def EditRedo():
