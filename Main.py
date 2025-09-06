@@ -2,22 +2,34 @@ import tkinter as tk
 from tkinter import ttk, StringVar
 from tkinter import filedialog
 from tkinter import messagebox
+import tkinter.font as tkFont
+import os
 import configparser
+# NEEDS INSTALL
+import ttkthemes
 root = tk.Tk()
 root.geometry("300x300")
-
+config = configparser.ConfigParser()
 # Config
 def ConfigCreate():
-    config = configparser.ConfigParser()
+    global config
+
 
     config['General'] = {"Current_Font":'Arial'}
 
     with open('config.ini', 'w') as configfile:
         config.write(configfile)
-if __name__ == "__main__":
-    ConfigCreate()
-TextAreaMainFont = ("Helvetica", 20)
-
+# if __name__ == "__main__":
+#     ConfigCreate()
+TextAreaMainFont = ("Helvetica", 13)
+def LoadConfig():
+    global config
+    config = configparser.ConfigParser()
+    if os.path.exists("config.ini"):
+        config.read("config.ini")
+    else:
+        ConfigCreate()
+        config.read("config.ini")
 # Var
 SettingsWindow = None
 
@@ -43,7 +55,12 @@ def FileExit():
         root.destroy()
 def ConfirmButtonSettings():
     SelectedFont = SettingsFontDropdown.get()
-    TextAreaMain.config(font=SelectedFont)
+    FontSize = 13
+    font = (SelectedFont, FontSize)
+    TextAreaMain.config(font=font)
+    config["General"]["Current_Font"] = SelectedFont
+    with open("config.ini", "w") as configfile:
+        config.write(configfile)
     SettingsWindow.destroy()
 def FileSettings():
     global SettingsWindow
@@ -100,7 +117,19 @@ def FileSettings():
                    "Yu Gothic",
                    "Yu GothicUI",
                    "Sylfaen",
-                   "Symbol"]
+                   "Symbol",
+                   "Cascadia Mono SemiBold",
+                   "Cascadia Mono,"
+                   "Cascadia Mono SemiLight",
+                   "Cascadia Mono Light,"
+                   "Cascadia Mono ExtraLight",
+                   "Cascadia Code SemiBold",
+                   "Cascadia Code",
+                   "TINspireKeysChinese",
+                   "Glass Gauge T182T",
+                   "SimSun-ExtB",
+                   "Cambria Math",
+                   "Courier new CE"]
     if SettingsWindow and SettingsWindow.winfo_exists():
         SettingsWindow.lift()
         return
@@ -118,6 +147,12 @@ def FileSettings():
     SettingsConfirmButton = ttk.Button(SettingsWindow, text="Confirm",command=ConfirmButtonSettings)
     SettingsConfirmButton.grid(row=1,column=0)
     SelectedFont = SettingsFontDropdown.get()
+def FetchFont():
+    global font
+    print("there is literally no way you couldve found this like literally im so close to getting to 5h in siege week one theres no way Ill be motivated enough for siege week real"
+          "aaaaaah"
+          "AAAAAaH"
+          "SAVE ME")
 def EditUndo():
     TextAreaMain.event_generate("<<Undo>>")
 def EditRedo():
@@ -139,7 +174,10 @@ TextAMainFrame.pack(expand=True, fill = tk.BOTH)
 ScrollbarMainRight = ttk.Scrollbar(TextAMainFrame, orient="vertical")
 ScrollbarMainRight.pack(side=tk.RIGHT,fill=tk.Y)
 #Text area
-TextAreaMain = tk.Text(TextAMainFrame, wrap=tk.WORD, font=TextAreaMainFont, undo=True, yscrollcommand=ScrollbarMainRight.set)
+LoadConfig()
+fetchfont = config["General"].get("Current_Font","Arial")
+font = (fetchfont,13)
+TextAreaMain = tk.Text(TextAMainFrame, wrap=tk.WORD, font=font, undo=True, yscrollcommand=ScrollbarMainRight.set)
 TextAreaMain.pack(side=tk.LEFT, expand=True,fill=tk.BOTH)
 ScrollbarMainRight.config(command=TextAreaMain.yview)
 # File Menu
