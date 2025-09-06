@@ -42,11 +42,14 @@ def FileExit():
     if ExitConfirmation:
         root.destroy()
 def ConfirmButtonSettings():
-
+    SelectedFont = SettingsFontDropdown.get()
+    TextAreaMain.config(font=SelectedFont)
+    SettingsWindow.destroy()
 def FileSettings():
     global SettingsWindow
     global FontOptions
     global SelectedFont
+    global SettingsFontDropdown
     FontOptions = ["Arial",
                    "Calibri",
                    "Verdana",
@@ -112,8 +115,9 @@ def FileSettings():
     SettingsFontDropdown = ttk.Combobox(SettingsWindowTopLabelFrame, values=FontOptions, state="readonly")
     SettingsFontDropdown.grid(row=0,column=1)
     SettingsFontDropdown.set("Arial")
-    SettingsConfirmButton = ttk.Button(SettingsWindow, text="Confirm")
+    SettingsConfirmButton = ttk.Button(SettingsWindow, text="Confirm",command=ConfirmButtonSettings)
     SettingsConfirmButton.grid(row=1,column=0)
+    SelectedFont = SettingsFontDropdown.get()
 def EditUndo():
     TextAreaMain.event_generate("<<Undo>>")
 def EditRedo():
