@@ -5,6 +5,7 @@ from tkinter import messagebox
 import tkinter.font as tkFont
 import os
 import configparser
+import subprocess
 # NEEDS INSTALL
 import ttkthemes
 root = tk.Tk()
@@ -37,15 +38,26 @@ SettingsWindow = None
 def FileNew():
     TextAreaMain.delete(1.0,tk.END)
 def FileOpen():
-    File=filedialog.askopenfilename(defaultextension=".txt", filetypes=[("Text Files","*.txt"),("All files","*.*")])
+    global CurrentFile
+    File=filedialog.askopenfilename(defaultextension=".py", filetypes=[("Python Files","*.py"),("All files","*.*")])
     if File:
+        CurrentFile = File
         with open(File, "r") as F:
             Content = F.read()
         TextAreaMain.delete(1.0,tk.END)
         TextAreaMain.insert(tk.END, Content)
 def FileSave():
-    File = filedialog.asksaveasfilename(defaultextension=".txt",filetypes=[("Text Files","*.txt"),("All files", "*.*")])
+    global CurrentFile
+    if CurrentFile:
+        with open(CurrentFile, "w") as F:
+            F.write(TextAreaMain.get(1.0,tk.END))
+    else:
+        FileSaveAs()
+def FileSaveAs():
+    global CurrentFile
+    File = filedialog.asksaveasfilename(defaultextension=".py",filetypes=[("Python Files", ".py"),("All files","*.*")])
     if File:
+        CurrentFile = File
         with open(File, "w") as F:
             F.write(TextAreaMain.get(1.0,tk.END))
 def FileExit():
@@ -163,6 +175,8 @@ def EditCopy():
     TextAreaMain.event_generate("<<Copy>>")
 def EditPaste():
     TextAreaMain.event_generate("<<Paste>>")
+def RunRun():
+    pass
 
 # Full Menu bar
 MenuBar=tk.Menu(root)
@@ -196,4 +210,9 @@ EditMenu.add_command(label="Redo", command=EditRedo)
 EditMenu.add_command(label="Cut", command=EditCut)
 EditMenu.add_command(label="Copy", command=EditCopy)
 EditMenu.add_command(label="Paste", command=EditPaste)
+
+RunMenu = tk.Menu(MenuBar,tearoff=0)
+MenuBar.add_cascade(label="Run", menu=RunMenu)
+RunMenu.add_command(label="Run", command=RunRun)
 root.mainloop()
+
