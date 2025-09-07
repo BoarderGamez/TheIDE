@@ -6,6 +6,8 @@ import tkinter.font as tkFont
 import os
 import configparser
 import subprocess
+from tkinter.constants import NORMAL
+
 # NEEDS INSTALL
 import ttkthemes
 root = tk.Tk()
@@ -198,17 +200,41 @@ def RunRun():
         messagebox.showerror("Error","Please save file before running")
         return
     FileSave()
+    OutputWindow =tk.Toplevel(root)
+    OutputWindow.title(f"Output - {os.path.basename(CurrentFile)}")
+    OutputWindow.geometry("500x300")
+    OutputFrame = ttk.Frame(OutputWindow)
+    OutputFrame.pack(expand=True, fill =tk.BOTH)
+    OutputScrollbar = ttk.Scrollbar(OutputFrame, orient="vertical")
+    OutputScrollbar.pack(side=tk.RIGHT,fill=tk.Y)
+    fetchfont = config["General"].get("Current_Font", "Arial")
+    font = (fetchfont, 13)
+    OutputText = tk.Text(OutputFrame,wrap = tk.WORD,font=font,yscrollcommand=OutputScrollbar.set,state=NORMAL)
+    OutputText.pack(side=tk.LEFT,expand=True,fill =tk.BOTH)
+    OutputScrollbar.config(command=OutputText.yview)
+
     try:
-        subprocess.Popen(["python", CurrentFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        precess = subprocess.Popen(["python", CurrentFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout,stderr=precess.communicate()
+        if stdout:
+            OutputText.insert(tk.END,stdout)
+        if stderr:
+            OutputText.insert(tk.END,stderr)
     except Exception as e:
         messagebox.showerror("Run Error (make sure python is added to PATH)",str(e))
+def LineUpdate(event=None):
+    line, col = TextAreaMain.index(tk.INSERT).split(".")
+    linelabel.config(text=f"Line: {line}")
+root.rowconfigure(0,weight=1)
+root.rowconfigure(1,weight=0)
+root.columnconfigure(0,weight=1)
 
 # Full Menu bar
 MenuBar=tk.Menu(root)
 root.config(menu=MenuBar)
 #Frame
 TextAMainFrame = ttk.Frame(root)
-TextAMainFrame.pack(expand=True, fill = tk.BOTH)
+TextAMainFrame.grid(row=0 ,column=0,sticky="nsew")
 #ScrollBar
 ScrollbarMainRight = ttk.Scrollbar(TextAMainFrame, orient="vertical")
 ScrollbarMainRight.pack(side=tk.RIGHT,fill=tk.Y)
@@ -239,9 +265,15 @@ EditMenu.add_command(label="Paste", command=EditPaste)
 RunMenu = tk.Menu(MenuBar,tearoff=0)
 MenuBar.add_cascade(label="Run", menu=RunMenu)
 RunMenu.add_command(label="Run", command=RunRun)
+belowframe = ttk.Frame(root)
+belowframe.grid(row=1, column=0,sticky="ew")
+linelabel = ttk.Label(belowframe,text="Line:0")
+linelabel.pack(side=tk.RIGHT,padx=5)
 #binds
 TextAreaMain.bind("<Tab>", TabThingy)
 TextAreaMain.bind("<Return>", Enterkeylinethingy)
+TextAreaMain.bind("<KeyRelease>",LineUpdate)
+TextAreaMain.bind("<ButtonRelease>",LineUpdate())
 root.mainloop()
 
 
