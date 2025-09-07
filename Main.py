@@ -11,6 +11,7 @@ import ttkthemes
 root = tk.Tk()
 root.geometry("300x300")
 config = configparser.ConfigParser()
+CurrentFile=None
 # Config
 def ConfigCreate():
     global config
@@ -42,10 +43,15 @@ def FileOpen():
     File=filedialog.askopenfilename(defaultextension=".py", filetypes=[("Python Files","*.py"),("All files","*.*")])
     if File:
         CurrentFile = File
-        with open(File, "r") as F:
-            Content = F.read()
-        TextAreaMain.delete(1.0,tk.END)
-        TextAreaMain.insert(tk.END, Content)
+        try:
+            with open(File, "r") as F:
+                Content = F.read()
+            TextAreaMain.config(state="normal")
+            TextAreaMain.delete(1.0,tk.END)
+            TextAreaMain.insert(tk.END, Content)
+            TextAreaMain.edit_reset()
+        except Exception as e:
+            messagebox.showerror("Error", f"couldn't open file whomp whomp:\n{e}")
 def FileSave():
     global CurrentFile
     if CurrentFile:
@@ -74,6 +80,17 @@ def ConfirmButtonSettings():
     with open("config.ini", "w") as configfile:
         config.write(configfile)
     SettingsWindow.destroy()
+def TabThingy(event):
+    TextAreaMain.insert(tk.INSERT," "*4)
+    return "brek"
+def Enterkeylinethingy(event):
+    lineindex = TextAreaMain.index("insert linestart")
+    linetext = TextAreaMain.get(lineindex,lineindex + "lineend")
+    indent = len(linetext)- len(linetext.lstrip(" "))
+    TextAreaMain.insert(tk.INSERT, "\n"+" " * indent)
+    if linetext.strip().endswith(":"):
+        TextAreaMain.insert(tk.INSERT," "*4)
+    return "break"
 def FileSettings():
     global SettingsWindow
     global FontOptions
@@ -176,7 +193,15 @@ def EditCopy():
 def EditPaste():
     TextAreaMain.event_generate("<<Paste>>")
 def RunRun():
-    pass
+    global CurrentFile
+    if not CurrentFile:
+        messagebox.showerror("Error","Please save file before running")
+        return
+    FileSave()
+    try:
+        subprocess.Popen(["python", CurrentFile], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception as e:
+        messagebox.showerror("Run Error (make sure python is added to PATH)",str(e))
 
 # Full Menu bar
 MenuBar=tk.Menu(root)
@@ -214,5 +239,11 @@ EditMenu.add_command(label="Paste", command=EditPaste)
 RunMenu = tk.Menu(MenuBar,tearoff=0)
 MenuBar.add_cascade(label="Run", menu=RunMenu)
 RunMenu.add_command(label="Run", command=RunRun)
+#binds
+TextAreaMain.bind("<Tab>", TabThingy)
+TextAreaMain.bind("<Return>", Enterkeylinethingy)
 root.mainloop()
+
+
+
 
