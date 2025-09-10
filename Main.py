@@ -70,7 +70,6 @@ def FileSaveAs():
             F.write(TextAreaMain.get(1.0,tk.END))
 def FileExit():
     ExitConfirmation = messagebox.askyesno("Confirm Exit", "Do you want to exit?")
-
     if ExitConfirmation:
         root.destroy()
 def ConfirmButtonSettings():
@@ -229,6 +228,9 @@ root.rowconfigure(0,weight=1)
 root.rowconfigure(1,weight=0)
 root.columnconfigure(0,weight=1)
 
+LoadConfig()
+fetchfont = config["General"].get("Current_Font","Arial")
+font = (fetchfont,13)
 # Full Menu bar
 MenuBar=tk.Menu(root)
 root.config(menu=MenuBar)
@@ -238,10 +240,12 @@ TextAMainFrame.grid(row=0 ,column=0,sticky="nsew")
 #ScrollBar
 ScrollbarMainRight = ttk.Scrollbar(TextAMainFrame, orient="vertical")
 ScrollbarMainRight.pack(side=tk.RIGHT,fill=tk.Y)
+#listbox
+ListBoxFileName = tk.Listbox(TextAMainFrame, highlightcolor="black", highlightthickness=1,selectmode=tk.SINGLE,font=font,
+                             )
+ListBoxFileName.pack(side=tk.LEFT,fill=tk.Y)
 #Text area
-LoadConfig()
-fetchfont = config["General"].get("Current_Font","Arial")
-font = (fetchfont,13)
+
 TextAreaMain = tk.Text(TextAMainFrame, wrap=tk.WORD, font=font, undo=True, yscrollcommand=ScrollbarMainRight.set)
 TextAreaMain.pack(side=tk.LEFT, expand=True,fill=tk.BOTH)
 ScrollbarMainRight.config(command=TextAreaMain.yview)
@@ -270,7 +274,7 @@ belowframe.grid(row=1, column=0,sticky="ew")
 linelabel = ttk.Label(belowframe,text="Line:0")
 linelabel.pack(side=tk.RIGHT,padx=5)
 #binds
-TextAreaMain.bind("<Tab>", TabThingy)
+# TextAreaMain.bind("<Tab>", TabThingy)
 TextAreaMain.bind("<Return>", Enterkeylinethingy)
 TextAreaMain.bind("<KeyRelease>",LineUpdate)
 TextAreaMain.bind("<ButtonRelease>",LineUpdate())
